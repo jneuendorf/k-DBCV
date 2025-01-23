@@ -2,6 +2,8 @@
 
 k-DBCV is an efficient python implementation of the density based cluster validation (DBCV) score proposed by Moulavi et al. (2014). The implementation leverages a k-dimensional tree to efficiently calculate intercluster distances resulting in improved performance when compared with previous implementations. 
 
+For optimizing k-DBCV to choose parameters from commonly used density-based clustering algorithms (DBSCAN, HDBSCAN, OPTICS) we recommend looking at our DBOpt library: https://github.com/Kaufman-Lab-Columbia/DBOpt
+
 ## Getting Started
 ### Dependencies
 - SciPy
