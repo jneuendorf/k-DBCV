@@ -82,5 +82,7 @@ k-DBCV is licensed with an MIT license. See LICENSE file for more information.
 
 Hammer, J. L., Devanny, A. J. & Kaufman, L. J. Density-based optimization for unbiased, reproducible clustering applied to single molecule localization microscopy. Preprint at https://www.biorxiv.org/content/10.1101/2024.11.01.621498v1 (2024)
 
+![image](https://github.com/user-attachments/assets/c2649dae-e7aa-4f43-af39-f00532831a9d)
+
 ## Contact 
 kaufmangroup.rubylab@gmail.com
