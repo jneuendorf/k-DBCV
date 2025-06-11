@@ -78,10 +78,11 @@ Hammer, J. L., Devanny, A. J. & Kaufman, L. J. Density-based optimization for un
 k-DBCV is licensed with an MIT license. See LICENSE file for more information.
 
 ## Referencing
-#### In addition to citing Moulavi et al., if you use this repository, please cite with the following (currently in preprint):
+#### In addition to citing Moulavi et al., if you use this repository, please cite with the following:
 
-Hammer, J. L., Devanny, A. J. & Kaufman, L. J. Density-based optimization for unbiased, reproducible clustering applied to single molecule localization microscopy. Preprint at https://www.biorxiv.org/content/10.1101/2024.11.01.621498v1 (2024)
+Hammer, J.L., Devanny, A.J. & Kaufman, L.J. Bayesian optimized parameter selection for density-based clustering applied to single molecule localization microscopy. Commun Biol 8, 902 (2025). https://doi.org/10.1038/s42003-025-08332-0
 
+Code DOI:
 ![image](https://github.com/user-attachments/assets/ea5d6c65-fac4-4813-85b4-eb7938d3b839)
 
 ## Contact 
