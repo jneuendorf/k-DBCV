@@ -1,9 +1,10 @@
+from typing import Optional
+
 import numpy as np
-from scipy.spatial.distance import pdist, squareform
+import numpy.typing as npt
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.spatial import cKDTree
-import numpy.typing as npt
-from typing import List, Tuple, Dict, Optional
+from scipy.spatial.distance import pdist, squareform
 
 
 # Flags indicating possible scoring outcomes
@@ -13,18 +14,18 @@ _SUCCESS = 0
 
 
 def DBCV_score(
-    X: npt.NDArray[np.float_],
+    X: npt.NDArray[np.float64],
     labels: npt.NDArray[np.int_],
     ind_clust_scores: bool = False, 
     mem_cutoff: float = 25.0,
     batch_mode = False
-) -> Tuple[float, Optional[List[float]]]:
+) -> tuple[float, Optional[list[float]]]:
     """
     Main function that returns the aggregate and (optionally) individual
     DBCV cluster scores based on input coordinate data (clustered + noise).
 
     Args:
-        X (npt.NDArray[np.float_]):
+        X (npt.NDArray[np.float64]):
             An array of float coordinates with shape (N, d), where N is the total
             number of points (clustered + noise) and d is the dimensionality of the
             data.
@@ -45,9 +46,9 @@ def DBCV_score(
             suppressed (False).
 
     Returns:
-        Tuple containing:
+        tuple containing:
             - float: The aggregate DBCV score for the input data.
-            - Optional[List[float]]: The list of individual DBCV scores for each
+            - Optional[list[float]]: The list of individual DBCV scores for each
               cluster. Only returned if ind_clust_scores is set to True, otherwise
               returned as None.
     """
@@ -107,12 +108,12 @@ def DBCV_score(
 
 
 def format_data(
-    X: npt.NDArray[np.float_],
+    X: npt.NDArray[np.float64],
     labels: npt.NDArray[np.int_]
-) -> Tuple[
+) -> tuple[
     int,
-    Optional[npt.NDArray[np.float_]],
-    Optional[List[npt.NDArray[np.float_]]],
+    Optional[npt.NDArray[np.float64]],
+    Optional[list[npt.NDArray[np.float64]]],
     Optional[npt.NDArray[np.int_]],
     int,
     int,
@@ -123,32 +124,32 @@ def format_data(
     on input labels.
 
     Args:
-        X (npt.NDArray[np.float_]):
+        X (npt.NDArray[np.float64]):
             See DBCV_score() args.
         
         labels (npt.NDArray[np.int_]):
             See DBCV_score() args.
 
     Returns:
-        Tuple containing:
+        tuple containing:
             - An integer status code indicating whether the data can be scored:
               - _ALL_NOISE (int): Scoring is not possible because all points are
                 assigned to noise.
               - _NOT_ENOUGH_CLUSTERS (int): Scoring is not possible because not enough
                 clusters were found.
               - _SUCCESS (int): The data can be scored.
-            - Optional[npt.NDArray[np.float_]]: A master array of float coordinates
+            - Optional[npt.NDArray[np.float64]]: A master array of float coordinates
               with shape (N, d + 1), where N is the number of clustered points and d
               is the dimensionality of the data. Contains all clustered points and
               associated cluster labels. The clustered points are contained in the
               first d columns, followed by the labels in the last column. The array is
               sorted in ascending order by the label column. Returns as None if the
               data cannot be scored.
-            - Optional[List[npt.NDArray[np.float_]]]: A list of arrays with
-              len(List) = num_clusters. Each array contains the coordinates
+            - Optional[list[npt.NDArray[np.float64]]]: A list of arrays with
+              len(list) = num_clusters. Each array contains the coordinates
               corresponding to a specific cluster label, stored in ascending order of
-              labels. For example, List[0] contains the coordinates belonging to
-              cluster 0, List[1] contains cluster 1, etc. Arrays contain floats and
+              labels. For example, list[0] contains the coordinates belonging to
+              cluster 0, list[1] contains cluster 1, etc. Arrays contain floats and
               have shape (N, d + 1), where N is the number of points belonging to the
               current cluster and d is the dimensionality. The first d columns contain
               the coordinates, while the last column contains the label for the
@@ -269,13 +270,13 @@ def predict_memory_allocation(
 
 def intracluster_analysis(
     N_clust: int,
-    cluster_groups: List[npt.NDArray[np.float_]],
+    cluster_groups: list[npt.NDArray[np.float64]],
     d: int,
-) -> Tuple[
-    Dict[int, float],
-    npt.NDArray[np.float_],
-    Dict[int, npt.NDArray[np.float_]],
-    Dict[int, npt.NDArray[np.int_]]
+) -> tuple[
+    dict[int, float],
+    npt.NDArray[np.float64],
+    dict[int, npt.NDArray[np.float64]],
+    dict[int, npt.NDArray[np.int_]]
 ]:
     """
     Analyzes the properties of individual clusters for scoring. Computes the
@@ -286,23 +287,23 @@ def intracluster_analysis(
     Args:
         N_clust (int):
             The total number of clusters to be analyzed.
-        cluster_groups (List[npt.NDArray[np.float_]]):
+        cluster_groups (list[npt.NDArray[np.float64]]):
             The sorted clustered points and labels, returned from format_data() in
-            Tuple[2].
+            tuple[2].
         d (int):
             The dimensionality of the data.
 
     Returns:
-        Tuple containing:
-            - Dict[int, float]: The sparseness values computed for each cluster. The
+        tuple containing:
+            - dict[int, float]: The sparseness values computed for each cluster. The
               key indicates the cluster label and the value indicates the sparseness.
-            - npt.NDArray[np.float_]: An array containing the core distances
+            - npt.NDArray[np.float64]: An array containing the core distances
               computed by all_core_points_distance() for all coordinates.
-            - Dict[int, npt.NDArray[np.float_]]: The core distance for core points in
+            - dict[int, npt.NDArray[np.float64]]: The core distance for core points in
               all clusters. The key indicates the cluster label and the value contains
               an array with the core distance for each core point in the associated
               cluster.
-            - Dict[int, npt.NDArray[np.int_]]: The indices of core points in each
+            - dict[int, npt.NDArray[np.int_]]: The indices of core points in each
               cluster. The key indicates the cluster label and the value contains an
               array of integer indices used to index core points from the full
               coordinate array for each cluster, as contained in the cluster_groups
@@ -335,23 +336,23 @@ def intracluster_analysis(
 
 
 def all_points_core_distance(
-    distance_matrix_condensed: npt.NDArray[np.float_],
+    distance_matrix_condensed: npt.NDArray[np.float64],
     d: int
-) -> npt.NDArray[np.float_]:
+) -> npt.NDArray[np.float64]:
     """
     Helper function for intracluster_analysis() that computes the all points
     core distance of points in a cluster according to the definition
     discussed in Moulavi et al.
 
     Args:
-        distance_matrix_condensed (npt.NDArray[np.float_]):
+        distance_matrix_condensed (npt.NDArray[np.float64]):
             The condensed pairwise distance matrix for the points in the current
             cluster, as computed by pdist() in scipy.
         d (int):
             The dimensionality of the data.
 
     Returns:
-        - npt.NDArray[np.float_]: Array containing the all points core distance
+        - npt.NDArray[np.float64]: Array containing the all points core distance
           for the current cluster.
     """
 
@@ -369,15 +370,15 @@ def all_points_core_distance(
 
 
 def MST_builder(
-    MRD_matrix: npt.NDArray[np.float_]
-) -> Tuple[float, npt.NDArray[np.int_]]:
+    MRD_matrix: npt.NDArray[np.float64]
+) -> tuple[float, npt.NDArray[np.int_]]:
     """
     Helper function for intracluster_analysis() that identifies core points
     based on the all points core distance, and then computes the sparseness
     of the current cluster.
 
     Args:
-        MRD_matrix (npt.NDArray[np.float_]):
+        MRD_matrix (npt.NDArray[np.float64]):
             Array of shape (N, N), where N is the number of points in the current
             cluster. The MRD_matrix contains mutual reachability distances, which
             consider the max core distance and euclidean distance between each point
@@ -408,41 +409,41 @@ def MST_builder(
 
 
 def core_points_analysis(
-    cluster_sort: npt.NDArray[np.float_],
+    cluster_sort: npt.NDArray[np.float64],
     cluster_ind: npt.NDArray[np.int_],
-    core_pts: Dict[int, npt.NDArray[np.int_]]
-) -> Tuple[
-    npt.NDArray[np.float_],
-    List[npt.NDArray[np.float_]],
+    core_pts: dict[int, npt.NDArray[np.int_]]
+) -> tuple[
+    npt.NDArray[np.float64],
+    list[npt.NDArray[np.float64]],
     npt.NDArray[np.int_]
 ]:
     """
     Formats core points for intercluster_analysis().
 
     Args:
-        cluster_sort (npt.NDArray[np.float_]):
-            See format_data(), returned in Tuple[1].
+        cluster_sort (npt.NDArray[np.float64]):
+            See format_data(), returned in tuple[1].
         cluster_ind (npt.NDArray[np.int_]): 
-            See format_data(), returned in Tuple[3].
+            See format_data(), returned in tuple[3].
         core_pts (npt.NDArray[np.int_]): 
-            See intracluster_analysis(), returned in Tuple[3].
+            See intracluster_analysis(), returned in tuple[3].
 
     Returns:
-        Tuple containing:
-            - npt.NDArray[np.float_]: An array of shape (N, d + 1), where N is the
+        tuple containing:
+            - npt.NDArray[np.float64]: An array of shape (N, d + 1), where N is the
               total number of core points across all clusters, and d is the
               dimensionality of the data. The last column contains the cluster label
               associated with each core point, while the coordinate is contained in
               the first d columns. The array is sorted in ascending order by the
               cluster labels column.
-            - List[npt.NDArray[np.float_]]: A list of arrays containing the core point
+            - list[npt.NDArray[np.float64]]: A list of arrays containing the core point
               coordinates. Contains the same data as that returned by this function in
-              Tuple[0], but formatted such that List[0] contains the core point
-              coordinates for cluster label 0, List[1] contains the core point
+              tuple[0], but formatted such that list[0] contains the core point
+              coordinates for cluster label 0, list[1] contains the core point
               coordinates for cluster label 1, etc.
             - npt.NDArray[np.int_]: An array of integer indices indicating the
               transitions between cluster labels for the sorted core points that are
-              returned in Tuple[0] of this function. The indices are structured such
+              returned in tuple[0] of this function. The indices are structured such
               that [index_arr[0]:index_arr[1]] defines the core point coordinates
               belonging to cluster label 0, [index_arr[1]:index_arr[2]] defines the
               core point coordinates belonging to cluster label 1, etc.
@@ -470,30 +471,30 @@ def core_points_analysis(
 
 
 def intercluster_analysis(
-    core_X: npt.NDArray[np.float_],
-    core_cluster_groups: List[npt.NDArray[np.float_]],
+    core_X: npt.NDArray[np.float64],
+    core_cluster_groups: list[npt.NDArray[np.float64]],
     core_X_ind: npt.NDArray[np.int_],
-    core_dists_arr: npt.NDArray[np.float_],
-    core_dists_dict: Dict[int, npt.NDArray[np.float_]]
-) -> Dict[int, float]:
+    core_dists_arr: npt.NDArray[np.float64],
+    core_dists_dict: dict[int, npt.NDArray[np.float64]]
+) -> dict[int, float]:
     """
     Calculates the separation value for each cluster according to the
     definitions discussed in Moulavi et al.
 
     Args:
-        core_X (npt.NDArray[np.float_]):
-            See core_points_analysis(), returned in Tuple[0].
-        core_cluster_groups (List[npt.NDArray[np.float_]]):
-            See core_points_analysis(), returned in Tuple[1].
+        core_X (npt.NDArray[np.float64]):
+            See core_points_analysis(), returned in tuple[0].
+        core_cluster_groups (list[npt.NDArray[np.float64]]):
+            See core_points_analysis(), returned in tuple[1].
         core_X_ind (npt.NDArray[np.int_]):
-            See core_points_analysis(), returned in Tuple[2].
-        core_dists_arr (npt.NDArray[np.float_]):
-            See intracluster_analysis() returned in Tuple[1].
-        core_dists_dict (Dict[int, npt.NDArray[np.float_]]):
-            See intracluster_analysis(), returned in Tuple[2].
+            See core_points_analysis(), returned in tuple[2].
+        core_dists_arr (npt.NDArray[np.float64]):
+            See intracluster_analysis() returned in tuple[1].
+        core_dists_dict (dict[int, npt.NDArray[np.float64]]):
+            See intracluster_analysis(), returned in tuple[2].
 
     Returns:
-        - Dict[int, float]: The separation values for all clusters. The key
+        - dict[int, float]: The separation values for all clusters. The key
           indicates the cluster label, and the value indicates the associated
           separation for the cluster.
     """
@@ -566,38 +567,38 @@ def intercluster_analysis(
 
 
 def weighted_score(
-    sparseness: Dict[int, float],
-    separation: Dict[int, float],
+    sparseness: dict[int, float],
+    separation: dict[int, float],
     N_clust: int,
-    cluster_groups: List[npt.NDArray[np.float_]],
+    cluster_groups: list[npt.NDArray[np.float64]],
     n_samp: int, 
     ind_clust_scores: bool
-) -> Tuple[float, Optional[List[float]]]:
+) -> tuple[float, Optional[list[float]]]:
     """
     Performs weighted averaging of individual cluster scores to yield the
     aggregate DBCV score. Optionally returns individual scores if desired.
 
     Args:
-        sparseness (Dict[int, int]):
+        sparseness (dict[int, int]):
             The sparseness values for all clusters, returned from
-            intracluster_analysis() in Tuple[0].
-        separation (Dict[int, float]):
+            intracluster_analysis() in tuple[0].
+        separation (dict[int, float]):
             The separation value for all clusters, returned from
             intercluster_analysis().
         N_clust (int):
             The number of clusters to be analyzed.
-        cluster_groups (List[npt.NDArray[np.float_]]):
-            The sorted clusters, returned from format_data() in Tuple[2].
+        cluster_groups (list[npt.NDArray[np.float64]]):
+            The sorted clusters, returned from format_data() in tuple[2].
         n_samp (int):
             The total number of coordinates, returned from format_data() in
-            Tuple[4].
+            tuple[4].
         ind_cluster_scores (bool):
             Whether individual cluster scores should be returned (True) or not
             (False).
 
     Returns:
         - float: The aggregate DBCV score for the clustered data.
-        - Optional[List[float]]: The list of individual DBCV scores for each
+        - Optional[list[float]]: The list of individual DBCV scores for each
           cluster.
     """
     
